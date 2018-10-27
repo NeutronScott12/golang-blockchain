@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"os"
 	"runtime"
+	"flag"
 
 	"github.com/OGNeutron/golang-blockchain/blockchain"
 )
@@ -26,14 +27,17 @@ func (cli *CommandLine) validateArgs() {
 	}
 }
 
-func main() {
-	chain := blockchain.InitBlockChain()
+func (cli *CommandLine) addBlock(data string) {
+	cli.blockchain.AddBlock(data)
+	fmt.Println("Added Block!")
+}
 
-	chain.AddBlock("First Block after Genesis")
-	chain.AddBlock("Second Block after Genesis")
-	chain.AddBlock("Third Block after Genesis")
+func (cli *CommandLine) printChain() {
+	iter := cli.blockchain.Iterator()
 
-	for _, block := range chain.Blocks {
+	for {
+		block := iter.Next()
+
 		fmt.Printf("Previous Hash: %x\n", block.PrevHash)
 		fmt.Printf("Data in Block: %s\n", block.Data)
 		fmt.Printf("Hash: %X\n", block.Hash)
@@ -41,5 +45,54 @@ func main() {
 		pow := blockchain.NewProof(block)
 		fmt.Printf("Pow: %s\n", strconv.FormatBool(pow.Validate()))
 		fmt.Println()
+
+		if len(block.PrevHash) == 0 {
+			break
+		}
 	}
+}
+
+func (cli *CommandLine) run() {
+	cli.validateArgs()
+
+	addBlockCmd := flag.NewFlagSet("add", flag.ExitOnError)
+	printChainCmd := flag.NewFlagSet("print", flag.ExitOnError)
+	addBlockData := addBlockCmd.String("Block", "", "Block Data")
+
+	switch os.Args[1] {
+	case "add":
+		err: = addBlockCmd.Parse(os.Args[2:])
+		blockchain.Handle(err)
+
+	case "print":
+		err: = printChainCmd.Parse(os.Args[2:])
+		blockchain.Handle(err)
+
+	default:
+		cli.printUsage()
+		runtime.Goexit()
+	}
+
+	if addBlockCmd.Parsed() {
+		if *addBlockData == "" {
+			addBlockCmd.Usage()
+			runtime.Goexit()
+		}
+
+		cli.addBlock(*addBlockData)
+	}
+
+	if printChainCmd.Parsed() {
+		cli.printChain()
+	}
+
+}
+
+func main() {
+	chain := blockchain.InitBlockChain()
+
+	defer chain.Databse.Close()
+
+	cli := CommandLine{chain}
+	cli.run()
 }
