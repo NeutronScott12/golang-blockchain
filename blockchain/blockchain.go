@@ -1,8 +1,9 @@
 package blockchain
 
 import (
-	"github.com/dgraph-io/badger"
 	"fmt"
+
+	"github.com/dgraph-io/badger"
 )
 
 const (
@@ -16,7 +17,7 @@ type BlockChain struct {
 
 type BlockChainIterator struct {
 	CurrentHash []byte
-	Database 	*badger.DB
+	Database    *badger.DB
 }
 
 func InitBlockChain() *BlockChain {
@@ -29,14 +30,11 @@ func InitBlockChain() *BlockChain {
 	db, err := badger.Open(opts)
 	Handle(err)
 
-	err := db.Update(func(txn *badger.Txn) error {
+	err = db.Update(func(txn *badger.Txn) error {
 		if _, err := txn.Get([]byte("lh")); err == badger.ErrKeyNotFound {
 			fmt.Println("No existing blockchain found")
-
 			genesis := Genesis()
 			fmt.Println("Genesis proved")
-			
-
 			err = txn.Set(genesis.Hash, genesis.Serialize())
 			Handle(err)
 			err = txn.Set([]byte("lh"), genesis.Hash)
@@ -55,12 +53,11 @@ func InitBlockChain() *BlockChain {
 	Handle(err)
 
 	blockchain := BlockChain{lastHash, db}
-
 	return &blockchain
 }
 
 func (chain *BlockChain) AddBlock(data string) {
-	var lashHash []byte
+	var lastHash []byte
 
 	err := chain.Database.View(func(txn *badger.Txn) error {
 		item, err := txn.Get([]byte("lh"))
@@ -69,28 +66,24 @@ func (chain *BlockChain) AddBlock(data string) {
 
 		return err
 	})
-
 	Handle(err)
 
 	newBlock := CreateBlock(data, lastHash)
 
 	err = chain.Database.Update(func(txn *badger.Txn) error {
 		err := txn.Set(newBlock.Hash, newBlock.Serialize())
-
 		Handle(err)
-
 		err = txn.Set([]byte("lh"), newBlock.Hash)
 
-		chain.lastHash = newBlock.Hash
+		chain.LastHash = newBlock.Hash
 
 		return err
 	})
-
 	Handle(err)
 }
 
-func(chain *BlockChain) Iteractor() *BlockChainIterator {
-	iter := &BlockChainIterator{chain.lastHash, chain.Database}
+func (chain *BlockChain) Iterator() *BlockChainIterator {
+	iter := &BlockChainIterator{chain.LastHash, chain.Database}
 
 	return iter
 }
@@ -106,7 +99,6 @@ func (iter *BlockChainIterator) Next() *Block {
 
 		return err
 	})
-
 	Handle(err)
 
 	iter.CurrentHash = block.PrevHash

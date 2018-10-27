@@ -1,12 +1,13 @@
 package main
 
 import (
+	"flag"
 	"fmt"
-	"strconv"
 	"os"
 	"runtime"
-	"flag"
+	"strconv"
 
+	
 	"github.com/OGNeutron/golang-blockchain/blockchain"
 )
 
@@ -15,7 +16,7 @@ type CommandLine struct {
 }
 
 func (cli *CommandLine) printUsage() {
-	fmt.Println("Usage: ")
+	fmt.Println("Usage:")
 	fmt.Println(" add -block BLOCK_DATA - add a block to the chain")
 	fmt.Println(" print - Prints the blocks in the chain")
 }
@@ -38,12 +39,11 @@ func (cli *CommandLine) printChain() {
 	for {
 		block := iter.Next()
 
-		fmt.Printf("Previous Hash: %x\n", block.PrevHash)
-		fmt.Printf("Data in Block: %s\n", block.Data)
-		fmt.Printf("Hash: %X\n", block.Hash)
-
+		fmt.Printf("Prev. hash: %x\n", block.PrevHash)
+		fmt.Printf("Data: %s\n", block.Data)
+		fmt.Printf("Hash: %x\n", block.Hash)
 		pow := blockchain.NewProof(block)
-		fmt.Printf("Pow: %s\n", strconv.FormatBool(pow.Validate()))
+		fmt.Printf("PoW: %s\n", strconv.FormatBool(pow.Validate()))
 		fmt.Println()
 
 		if len(block.PrevHash) == 0 {
@@ -57,15 +57,15 @@ func (cli *CommandLine) run() {
 
 	addBlockCmd := flag.NewFlagSet("add", flag.ExitOnError)
 	printChainCmd := flag.NewFlagSet("print", flag.ExitOnError)
-	addBlockData := addBlockCmd.String("Block", "", "Block Data")
+	addBlockData := addBlockCmd.String("block", "", "Block data")
 
 	switch os.Args[1] {
 	case "add":
-		err: = addBlockCmd.Parse(os.Args[2:])
+		err := addBlockCmd.Parse(os.Args[2:])
 		blockchain.Handle(err)
 
 	case "print":
-		err: = printChainCmd.Parse(os.Args[2:])
+		err := printChainCmd.Parse(os.Args[2:])
 		blockchain.Handle(err)
 
 	default:
@@ -78,21 +78,18 @@ func (cli *CommandLine) run() {
 			addBlockCmd.Usage()
 			runtime.Goexit()
 		}
-
 		cli.addBlock(*addBlockData)
 	}
 
 	if printChainCmd.Parsed() {
 		cli.printChain()
 	}
-
 }
 
 func main() {
-
-	defer os.Exit()
+	defer os.Exit(0)
 	chain := blockchain.InitBlockChain()
-	defer chain.Databse.Close()
+	defer chain.Database.Close()
 
 	cli := CommandLine{chain}
 	cli.run()

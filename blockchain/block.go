@@ -49,7 +49,6 @@ func Deserialize(data []byte) *Block {
 	Handle(err)
 
 	return &block
-
 }
 
 func Handle(err error) {
