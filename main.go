@@ -89,8 +89,9 @@ func (cli *CommandLine) run() {
 }
 
 func main() {
-	chain := blockchain.InitBlockChain()
 
+	defer os.Exit()
+	chain := blockchain.InitBlockChain()
 	defer chain.Databse.Close()
 
 	cli := CommandLine{chain}
