@@ -2,6 +2,8 @@ package main
 
 import (
 	"os"
+
+	"github.com/OGNeutron/golang-blockchain/wallet"
 )
 
 func main() {

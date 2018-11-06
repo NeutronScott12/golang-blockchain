@@ -20,6 +20,8 @@ func (cli *CommandLine) printUsage() {
 	fmt.Println(" createblockchain -address ADDRESS creates a blockchain and sends genesis reward to address")
 	fmt.Println(" printchain - Prints the blocks in the chain")
 	fmt.Println(" send -from FROM -to TO -amount AMOUNT - Send amount of coins")
+	fmt.Println(" createwallet - Creates a new Wallet")
+	fmt.Println(" listaddresses - Lists the addresses in our wallet file")
 }
 
 func (cli *CommandLine) validateArgs() {
