@@ -2,15 +2,13 @@ package main
 
 import (
 	"os"
-
-	"github.com/OGNeutron/golang-blockchain/wallet"
 )
 
 func main() {
 	defer os.Exit(0)
-	// cli := cli.CommandLine{}
-	// cli.Run()
+	cli := cli.CommandLine{}
+	cli.Run()
 
-	w := wallet.MakeWallet()
-	w.Address()
+	// w := wallet.MakeWallet()
+	// w.Address()
 }
