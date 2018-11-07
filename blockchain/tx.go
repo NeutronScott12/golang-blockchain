@@ -2,6 +2,8 @@ package blockchain
 
 import (
 	"bytes"
+
+	"github.com/OGNeutron/golang-blockchain/wallet"
 )
 
 type TxOutput struct {
