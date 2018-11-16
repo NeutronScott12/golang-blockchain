@@ -9,4 +9,5 @@ require (
 	github.com/pkg/errors v0.8.0 // indirect
 	golang.org/x/crypto v0.0.0-20181030102418-4d3f4d9ffa16
 	golang.org/x/net v0.0.0-20181029044818-c44066c5c816 // indirect
+	gopkg.in/vrecan/death.v3 v3.0.1
 )
